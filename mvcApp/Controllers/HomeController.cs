@@ -25,8 +25,14 @@ namespace mvcApp.Controllers
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
+            var contact = new ContactViewModel();
 
             return View();
+        }
+        [HttpPost]
+        public IActionResult Contact(ContactViewModel viewModel)
+        {
+            return View(viewModel);
         }
 
         public IActionResult Error()
