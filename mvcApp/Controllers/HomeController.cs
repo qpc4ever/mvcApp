@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using mvcApp.Models;
 
 
@@ -12,6 +13,11 @@ namespace mvcApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IConfiguration _configuration;
+        public HomeController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public IActionResult Index()
         {
             return View();
@@ -39,8 +45,9 @@ namespace mvcApp.Controllers
                 //do something
                 var message = new MailMessage();
                 message.From =
-                    new MailAddress("do_not_reply@sightsource.net",
-                        "Sightsource Contact Bot");
+                    new MailAddress(
+                        _configuration["Contact:FromEmail"],
+                        _configuration["Contact:FromName"]);
 
                 //subject
 
@@ -48,7 +55,8 @@ namespace mvcApp.Controllers
                 
                 //To
 
-                message.To.Add(new MailAddress("qpc4ever@gmail.com"));
+                message.To.Add(new MailAddress(
+                    _configuration["Contact:ToEmail"], _configuration["Contact:ToName"]));
 
                 //message
 
@@ -56,7 +64,8 @@ namespace mvcApp.Controllers
                     Environment.NewLine + 
                     viewModel.Message;
 
-                var mailClient = new SmtpClient("email-smpt.us-east-1.amazonaws.com", 587);
+                var mailClient = new SmtpClient("email-smpt.us-east-1.amazonaws.com", 
+                    Convert.ToInt32(_configuration["Contact:SmtpPort"]));
                 
 
                 mailClient.UseDefaultCredentials = false;
@@ -66,6 +75,7 @@ namespace mvcApp.Controllers
                     );
 
                 mailClient.EnableSsl = true;
+
                 try
                 {
                     mailClient.Send(message);
