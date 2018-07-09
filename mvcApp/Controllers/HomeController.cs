@@ -68,7 +68,7 @@ namespace mvcApp.Controllers
                 mailClient.EnableSsl = true;
                 try
                 {
-                    //mailClient.Send(message);
+                    mailClient.Send(message);
                     viewModel.CompletedAt = DateTime.UtcNow;
                 }
                 catch(Exception ex)
